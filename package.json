@@ -1,11 +1,11 @@
 {
-  "name": "Research Assistant",
+  "name": "research-assistant",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/tools.ts",
+    "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc",
     "typecheck": "tsc --noEmit"

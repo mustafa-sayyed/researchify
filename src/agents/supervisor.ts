@@ -11,10 +11,10 @@ const model = new ChatGoogle({
   model: "gemini-2.5-flash",
 });
 
-const supervisor = model.withStructuredOutput(routingSchema);
+const supervisorAgent = model.withStructuredOutput(routingSchema);
 
-export const supervisorAgent = async (state: ResearchState) => {
-  const result = await supervisor.invoke([
+export const supervisorNode = async (state: ResearchState) => {
+  const result = await supervisorAgent.invoke([
     {
       role: "system",
       content: `You are a supervisor agent that oversees the research process. Your job is to decide which agent should act next based on the current state of the research. The possible agents are:
