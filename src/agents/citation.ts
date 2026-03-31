@@ -1,16 +1,16 @@
+import chalk from "chalk";
+import { CITATION_SYSTEM_PROMPT } from "../prompts.js";
 import type { ResearchState } from "../state.js";
 import { ChatGroq } from "@langchain/groq";
 
-const citationAgent = new ChatGroq("llama-3.1-8b-instant");
+const citationAgent = new ChatGroq("llama-3.3-70b-versatile");
 
 export async function citationNode(state: ResearchState) {
   console.log("[CITATION] Generating citations...");
   const result = await citationAgent.invoke([
     {
       role: "system",
-      content: `You are a citation agent that generates citations for sources based on a given query.
-      Your task is to provide accurate and properly formatted citations of the Search Results.
-      Make sure to provide clear and well-structured citations.`,
+      content: CITATION_SYSTEM_PROMPT,
     },
     {
       role: "human",
@@ -20,9 +20,14 @@ export async function citationNode(state: ResearchState) {
     },
   ]);
 
-  const citations = (result.content as string).split("\n").filter((line) => line.trim().length > 0);
+  const citations = result.content;
 
-  const finalReport = `## Research Report\n\n### Summary\n${state.summary}\n\n### Sources\n${citations.join("\n")}`;
+   const finalReport = `${chalk.bold.greenBright("## Research Report")}
+  \n\n${chalk.bold.magenta("### Summary")}\n
+  ${state.summary}
+  \n\n${chalk.bold.yellow("### Sources")}\n
+  ${citations}
+  `;
 
   console.log(`[CITATION] Generated ${citations.length} citations`);
   return { citations, finalReport };
