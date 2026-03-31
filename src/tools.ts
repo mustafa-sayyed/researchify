@@ -10,8 +10,8 @@ const tavilySearch = new TavilySearch({
 });
 
 export const webSearch = tool(
-  async ({ query }: { query: string }) => {
-    return await tavilySearch.invoke({ query });
+  async ({ query }) => {
+    return await tavilySearch.invoke({query});
   },
   {
     name: "webSearch",

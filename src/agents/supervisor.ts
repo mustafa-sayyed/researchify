@@ -1,23 +1,27 @@
 import { ChatGoogle } from "@langchain/google";
 import z from "zod";
 import type { ResearchState } from "../state.js";
+import { ChatGroq } from "@langchain/groq";
 
 const routingSchema = z.object({
   nextAgent: z.enum(["searcher", "summarizer", "citation", "done"]),
   reasoning: z.string(),
 });
 
-const model = new ChatGoogle({
-  model: "gemini-2.5-flash",
+const model = new ChatGroq({
+  model: "openai/gpt-oss-20b",
 });
 
 const supervisorAgent = model.withStructuredOutput(routingSchema);
 
 export const supervisorNode = async (state: ResearchState) => {
-  const result = await supervisorAgent.invoke([
-    {
-      role: "system",
-      content: `You are a supervisor agent that oversees the research process. Your job is to decide which agent should act next based on the current state of the research. The possible agents are:
+  console.log("[SUPERVISOR] Making decision...");
+  let result;
+  try {
+    result = await supervisorAgent.invoke([
+      {
+        role: "system",
+        content: `You are a supervisor agent that oversees the research process. Your job is to decide which agent should act next based on the current state of the research. The possible agents are:
             
             1. Searcher: This agent is responsible for searching the web for relevant information based on the query. It updates the searchResults field in the state.
 
@@ -33,16 +37,21 @@ export const supervisorNode = async (state: ResearchState) => {
             - getSummary: Use this tool to get the current summary from the state.
             - getCitations: Use this tool to get the current citations from the state.
             `,
-    },
-    {
-      role: "human",
-      content: `Query: ${state.query}
+      },
+      {
+        role: "human",
+        content: `Query: ${state.query}
         Search Results: ${state.searchResults.join("\n")}
         Summary: ${state.summary}
         Citations: ${state.citations.join("\n")}
       `,
-    },
-  ]);
+      },
+    ]);
+  } catch (error) {
+    console.error("[SUPERVISOR] Error during decision making:", error);
+    return { nextAgent: "done" };
+  }
 
+  console.log(`[SUPERVISOR] Decision: ${result.nextAgent} - ${result.reasoning}`);
   return { nextAgent: result.nextAgent };
 };

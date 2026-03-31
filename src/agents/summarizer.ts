@@ -1,9 +1,11 @@
 import { ChatGoogle } from "@langchain/google";
 import type { ResearchState } from "../state.js";
+import { ChatGroq } from "@langchain/groq";
 
-const summarizerAgent = new ChatGoogle("gemini-2.5-flash");
+const summarizerAgent = new ChatGroq("llama-3.1-8b-instant");
 
 export async function summarizerNode(state: ResearchState) {
+  console.log("[SUMMARIZER] Generating summary...");
   const result = await summarizerAgent.invoke([
     {
       role: "system",
@@ -20,5 +22,7 @@ export async function summarizerNode(state: ResearchState) {
     },
   ]);
 
-  return { summary: result.content[0] };
+  const summaryText = String(result.content[0] || "");
+  console.log(`[SUMMARIZER] Summary complete: ${summaryText.substring(0, 80)}...`);
+  return { summary: summaryText };
 }

@@ -17,7 +17,10 @@ export function buildGraph() {
     .addEdge("__start__", "supervisor")
 
     // Conditional routing from supervisor
-    .addConditionalEdges("supervisor", (state) => state.nextAgent, {
+    .addConditionalEdges("supervisor", (state) => {
+      console.log(`[ROUTING] Next agent: ${state.nextAgent}`);
+      return state.nextAgent;
+    }, {
       searcher: "searcher",
       summarizer: "summarizer",
       citation: "citation",

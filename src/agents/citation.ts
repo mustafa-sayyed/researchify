@@ -1,9 +1,10 @@
-import { ChatGoogle } from "@langchain/google";
 import type { ResearchState } from "../state.js";
+import { ChatGroq } from "@langchain/groq";
 
-const citationAgent = new ChatGoogle("gemini-2.5-flash");
+const citationAgent = new ChatGroq("llama-3.1-8b-instant");
 
 export async function citationNode(state: ResearchState) {
+  console.log("[CITATION] Generating citations...");
   const result = await citationAgent.invoke([
     {
       role: "system",
@@ -23,5 +24,6 @@ export async function citationNode(state: ResearchState) {
 
   const finalReport = `## Research Report\n\n### Summary\n${state.summary}\n\n### Sources\n${citations.join("\n")}`;
 
+  console.log(`[CITATION] Generated ${citations.length} citations`);
   return { citations, finalReport };
 }
