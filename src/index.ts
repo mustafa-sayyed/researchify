@@ -1,18 +1,53 @@
 import "dotenv/config";
 import { buildGraph } from "./graph.js";
-import chalk from "chalk"
+import figlet from "figlet";
+import chalk from "chalk";
+import { printLine } from "./utils/printLineSpace.js";
+import inquirer from "inquirer";
 
 async function main() {
-  console.log("Starting research workflow...");
-  const graph = buildGraph();
+	printLine(2);
 
-  const result = await graph.invoke({
-    query: "What is MCP ?, explain in detail what are developments in it, and what is the future of it ?",
-  });
+	console.log(
+		chalk.magenta.bold(
+			figlet.textSync("Multi Agent Research Assitant", {
+				horizontalLayout: "controlled smushing",
+			}),
+		),
+	);
 
-  console.log(chalk.bold.blueBright("\n\n=== FINAL REPORT ===\n\n"));
-  console.log(result.finalReport);
-  console.log(chalk.green("\nResearch workflow complete."));
+	printLine(2);
+
+	const res = await inquirer.prompt([
+		{
+			type: "input",
+			name: "reasearchTopic",
+			message: "Topic to Research:",
+		},
+	]);
+
+	printLine();
+	console.log(chalk.magentaBright(`You asked for: ${res.reasearchTopic}`));
+	printLine();
+
+
+	const graph = buildGraph();
+
+	console.log("Starting research workflow...");
+	const result = await graph.invoke(
+		{
+			query: res.reasearchTopic,
+		},
+		{
+			configurable: {
+				thread_id: "1",
+			},
+		},
+	);
+
+	console.log(chalk.bold.blueBright("\n\n=== FINAL REPORT ===\n\n"));
+	console.log(result.finalReport);
+	console.log(chalk.green("\nResearch workflow complete."));
 }
 
 main().catch(console.error);

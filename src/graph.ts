@@ -1,39 +1,31 @@
-import { StateGraph, END } from "@langchain/langgraph";
+import { StateGraph, END, MemorySaver } from "@langchain/langgraph";
 import { AgentState } from "./state.js";
 import { searcherNode } from "./agents/searcher.js";
 import { citationNode } from "./agents/citation.js";
 import { summarizerNode } from "./agents/summarizer.js";
 import { supervisorNode } from "./agents/supervisor.js";
 
-export function buildGraph() {
-  const graph = new StateGraph(AgentState)
-    .addNode("supervisor", supervisorNode)
-    .addNode("searcher", searcherNode)
-    .addNode("summarizer", summarizerNode)
-    .addNode("citation", citationNode)
+const checkpointer = new MemorySaver();
 
-    // Always start at supervisor
-    .addEdge("__start__", "supervisor")
+export const buildGraph = () => {
+	const agentGraph = new StateGraph(AgentState)
+		.addNode("searcher", searcherNode)
+		.addNode("summarizer", summarizerNode)
+		.addNode("citation", citationNode)
+		.addNode("supervisor", supervisorNode)
+		.addEdge("__start__", "supervisor")
+		.addConditionalEdges("supervisor", (state) => {
+			if (state.nextAgent === "done") {
+				return END;
+			}
 
-    // Conditional routing from supervisor
-    .addConditionalEdges(
-      "supervisor",
-      (state) => {
-        console.log(`[ROUTING] Next agent: ${state.nextAgent}`);
-        return state.nextAgent;
-      },
-      {
-        searcher: "searcher",
-        summarizer: "summarizer",
-        citation: "citation",
-        done: END,
-      },
-    )
+			return state.nextAgent;
+		})
+		.addEdge("searcher", "supervisor")
+		.addEdge("citation", "supervisor")
+		.addEdge("summarizer", "supervisor");
 
-    // All sub-agents report back to supervisor
-    .addEdge("searcher", "supervisor")
-    .addEdge("summarizer", "supervisor")
-    .addEdge("citation", "supervisor");
-
-  return graph.compile();
+	return agentGraph.compile({
+		checkpointer,
+	});
 }
