@@ -1,23 +1,16 @@
-import "dotenv/config";
-import { buildGraph } from "./graph.js";
+#!/usr/bin/env node
+
+import dotenv from "dotenv";
+dotenv.config({
+	path: "./.env",
+});
 import figlet from "figlet";
 import chalk from "chalk";
 import { printLine } from "./utils/printLineSpace.js";
 import inquirer from "inquirer";
+import { ensureCredentialsPresent } from "./utils/ensureCredentials.js";
 
-async function main() {
-	printLine(2);
-
-	console.log(
-		chalk.magenta.bold(
-			figlet.textSync("Multi Agent Research Assitant", {
-				horizontalLayout: "controlled smushing",
-			}),
-		),
-	);
-
-	printLine(2);
-
+async function startRsearch() {
 	const res = await inquirer.prompt([
 		{
 			type: "input",
@@ -25,11 +18,12 @@ async function main() {
 			message: "Topic to Research:",
 		},
 	]);
-
 	printLine();
 	console.log(chalk.magentaBright(`You asked for: ${res.reasearchTopic}`));
 	printLine();
 
+	// Dynamic Import after taking all required inputs from user
+	const { buildGraph } = await import("./graph.js");
 
 	const graph = buildGraph();
 
@@ -50,4 +44,39 @@ async function main() {
 	console.log(chalk.green("\nResearch workflow complete."));
 }
 
+async function main() {
+	printLine(2);
+
+	console.log(
+		chalk.magenta(
+			figlet.textSync("Rsearchify", {
+				horizontalLayout: "default",
+				font: "Coder Mini",
+			}),
+		),
+	);
+	console.log(
+		chalk.magenta(
+			"Your AI Research Assistant. Ask it to research any topic and get a comprehensive report with all the relevant information, links, and resources.",
+		),
+	);
+
+	printLine(2);
+
+
+	await ensureCredentialsPresent();
+
+	await startRsearch();
+}
+
 main().catch(console.error);
+
+process.on("SIGINT", () => {
+	console.log(chalk.red("\nProcess interrupted. Exiting..."));
+	process.exit(0);
+});
+
+process.on("SIGTERM", () => {
+	console.log(chalk.red("\nProcess terminated. Exiting..."));
+	process.exit(0);
+});

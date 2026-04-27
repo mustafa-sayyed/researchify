@@ -1,6 +1,6 @@
 import "dotenv/config";
 import type { ResearchState } from "../state.js";
-import { webSearch } from "../tools.js";
+import { webSearch } from "../tools/webSearch.js";
 
 export async function searcherNode(state: ResearchState) {
   console.log("[SEARCHER] Executing search...");

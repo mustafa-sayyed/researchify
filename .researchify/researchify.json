@@ -1,0 +1,5 @@
+{
+  "GROQ_API_KEY": "a",
+  "GEMINI_API_KEY": "b",
+  "TAVILY_API_KEY": "c"
+}

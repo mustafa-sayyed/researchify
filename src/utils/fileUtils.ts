@@ -6,8 +6,12 @@ export const saveDataInFile = async (
 	data: Record<string, any>,
 ) => {
 	await ensureDirectoryExist();
-	await checkFileExist(filePath);
-	await appendDataInFile(filePath, data);
+	const isFileExists = await checkFileExist(filePath);
+	if (!isFileExists) {
+		await writeDataInFile(filePath, data);
+	} else {
+		await appendDataInFile(filePath, data);
+	}
 };
 
 // check that .researchify directory exist, if not then create it
@@ -34,14 +38,31 @@ export const appendDataInFile = async (
 	data: Record<string, any>,
 ) => {
 	try {
-		const existingData = await fs.readFile(filePath, "utf-8");
+		const existingData = await fs.readFile(filePath, {
+			encoding: "utf-8",
+			flag: "",
+		});
 		const jsonData = await parseJSONData(existingData);
 		if (jsonData) {
 			data = { ...jsonData, ...data };
 		}
 		await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 	} catch (error) {
+		if ((error as any).code === "ENOENT") {
+			await writeDataInFile(filePath, data);
+		}
 		console.error(chalk.red("Error appending data to file: "), error);
+	}
+};
+
+export const writeDataInFile = async (
+	filePath: string,
+	data: Record<string, any>,
+) => {
+	try {
+		await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+	} catch (error) {
+		console.error(chalk.red("Error writing data to file: "), error);
 	}
 };
 
