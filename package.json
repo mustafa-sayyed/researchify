@@ -1,24 +1,40 @@
 {
-  "name": "research-assistant",
+  "name": "researchify",
   "version": "1.0.0",
-  "description": "",
+  "description": "Researchify - A CLI multi-agent research assistant built using LangChain and LangGraph",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc",
+    "prepare": "pnpm build",
     "typecheck": "tsc --noEmit"
   },
   "bin": {
     "researchify": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "research",
+    "agent",
+    "cli",
+    "langchain",
+    "langgraph",
+    "ai"
+  ],
+  "author": "Mustafa Sayyed",
+  "repository": {
+    "url": "git+https://github.com/mustafa-sayyed/researchify.git",
+    "type": "git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "packageManager": "pnpm@10.22.0",
   "dependencies": {
     "@clack/prompts": "^1.2.0",
