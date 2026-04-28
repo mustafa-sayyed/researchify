@@ -2,9 +2,10 @@ import { tool } from "langchain";
 import { TavilySearch } from "@langchain/tavily";
 import z from "zod";
 import "dotenv/config";
+import { getConfig } from "../config/index.js";
 
 const tavilySearch = new TavilySearch({
-	tavilyApiKey: process.env.TAVILY_API_KEY!,
+	tavilyApiKey: getConfig().TAVILY_API_KEY,
 	maxResults: 3,
 });
 
@@ -12,7 +13,7 @@ const webSearchInputSchema = z.object({
 	query: z.string().describe("the query to search the web for"),
 });
 
-type TavilyInvokeInput = Parameters<(typeof tavilySearch)["invoke"]>[0];
+export type TavilyInvokeInput = Parameters<(typeof tavilySearch)["invoke"]>[0];
 
 export const webSearch = tool(
 	async (input: z.infer<typeof webSearchInputSchema>) => {

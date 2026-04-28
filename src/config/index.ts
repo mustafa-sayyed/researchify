@@ -8,12 +8,17 @@ const researchifyConfigSchema = z.object({
 
 export type ResearchifyConfig = z.infer<typeof researchifyConfigSchema>;
 
-export const getConfig = (config: NodeJS.ProcessEnv | unknown) => {
-	const parsedConfig = researchifyConfigSchema.safeParse(config);
-	return parsedConfig.data;
-};
-
 export const validateCredentials = (config: NodeJS.ProcessEnv | unknown) => {
 	const result = researchifyConfigSchema.safeParse(config);
 	return result.success ? result.data : null;
+};
+
+let config: ResearchifyConfig;
+
+export const setConfig = (newConfig: ResearchifyConfig) => {
+	config = newConfig;
+};
+
+export const getConfig = (): ResearchifyConfig => {
+	return config;
 };

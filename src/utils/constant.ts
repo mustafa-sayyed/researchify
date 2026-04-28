@@ -1,0 +1,1 @@
+export const CREDENTIALS_FILE_PATH = ".researchify/researchify.json";

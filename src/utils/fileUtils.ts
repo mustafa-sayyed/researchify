@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import fs from "node:fs/promises";
+import { logError } from "./logger.js";
 
 export const saveDataInFile = async (
 	filePath: string,
@@ -51,7 +51,7 @@ export const appendDataInFile = async (
 		if ((error as any).code === "ENOENT") {
 			await writeDataInFile(filePath, data);
 		}
-		console.error(chalk.red("Error appending data to file: "), error);
+		logError("Error appending data to file: ", error);
 	}
 };
 
@@ -62,7 +62,7 @@ export const writeDataInFile = async (
 	try {
 		await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 	} catch (error) {
-		console.error(chalk.red("Error writing data to file: "), error);
+		logError("Error writing data to file: ", error);
 	}
 };
 
@@ -73,7 +73,7 @@ export const parseJSONData = async (
 	try {
 		return JSON.parse(data);
 	} catch (error) {
-		console.error(chalk.red("Error parsing JSON data: "), error);
+		logError("Error parsing JSON data: ", error);
 		return null;
 	}
 };

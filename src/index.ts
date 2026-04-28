@@ -8,7 +8,8 @@ import figlet from "figlet";
 import chalk from "chalk";
 import { printLine } from "./utils/printLineSpace.js";
 import inquirer from "inquirer";
-import { ensureCredentialsPresent } from "./utils/ensureCredentials.js";
+import { loadCredentials } from "./utils/ensureCredentials.js";
+import { logError } from "./utils/logger.js";
 
 async function startRsearch() {
 	const res = await inquirer.prompt([
@@ -63,8 +64,7 @@ async function main() {
 
 	printLine(2);
 
-
-	await ensureCredentialsPresent();
+	await loadCredentials();
 
 	await startRsearch();
 }
@@ -79,4 +79,10 @@ process.on("SIGINT", () => {
 process.on("SIGTERM", () => {
 	console.log(chalk.red("\nProcess terminated. Exiting..."));
 	process.exit(0);
+});
+
+process.on("uncaughtException", (err) => {
+	logError("Error: ", err);
+	logError("An unexpected error occurred. Exiting...");
+	process.exit(1);
 });
