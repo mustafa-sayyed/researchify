@@ -3,6 +3,7 @@
 import dotenv from "dotenv";
 dotenv.config({
 	path: "./.env",
+	quiet: true,
 });
 import figlet from "figlet";
 import chalk from "chalk";
@@ -12,13 +13,19 @@ import { loadCredentials } from "./utils/ensureCredentials.js";
 import { logError } from "./utils/logger.js";
 
 async function startRsearch() {
-	const res = await inquirer.prompt([
-		{
-			type: "input",
-			name: "reasearchTopic",
-			message: "Topic to Research:",
-		},
-	]);
+	const res = await inquirer
+		.prompt([
+			{
+				type: "input",
+				name: "reasearchTopic",
+				message: "Topic to Research:",
+			},
+		])
+		.catch((err) => {
+			logError("\nError taking user input", err);
+			logError("Exiting...");
+			process.exit(0);
+		});
 	printLine();
 	console.log(chalk.magentaBright(`You asked for: ${res.reasearchTopic}`));
 	printLine();
@@ -72,17 +79,22 @@ async function main() {
 main().catch(console.error);
 
 process.on("SIGINT", () => {
-	console.log(chalk.red("\nProcess interrupted. Exiting..."));
+	logError("\nProcess interrupted. Exiting...");
 	process.exit(0);
 });
 
 process.on("SIGTERM", () => {
-	console.log(chalk.red("\nProcess terminated. Exiting..."));
+	logError("\nProcess terminated. Exiting...");
 	process.exit(0);
 });
 
+process.on("unhandledRejection", (err) => {
+	logError("Error: ", err);
+	logError("An unexpected error occurred. Exiting...");
+	process.exit(0);
+});
 process.on("uncaughtException", (err) => {
 	logError("Error: ", err);
 	logError("An unexpected error occurred. Exiting...");
-	process.exit(1);
+	process.exit(0);
 });

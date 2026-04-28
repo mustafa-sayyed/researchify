@@ -1,8 +1,12 @@
 import type { ResearchState } from "../state.js";
 import { ChatGroq } from "@langchain/groq";
 import { SUMMARISER_SYSTEM_PROMPT } from "../prompts.js";
+import { getConfig } from "../config/index.js";
 
-const summarizerAgent = new ChatGroq("llama-3.3-70b-versatile");
+const summarizerAgent = new ChatGroq({
+  model: "llama-3.3-70b-versatile",
+  apiKey: getConfig().GROQ_API_KEY,
+});
 
 export async function summarizerNode(state: ResearchState) {
   console.log("[SUMMARIZER] Generating summary...");

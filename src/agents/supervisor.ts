@@ -2,6 +2,7 @@ import z from "zod";
 import type { ResearchState } from "../state.js";
 import { ChatGroq } from "@langchain/groq";
 import { SUPERVISOR_SYSTEM_PROMPT } from "../prompts.js";
+import { getConfig } from "../config/index.js";
 
 const routingSchema = z.object({
   nextAgent: z.enum(["searcher", "summarizer", "citation", "done"]),
@@ -10,6 +11,7 @@ const routingSchema = z.object({
 
 const model = new ChatGroq({
   model: "openai/gpt-oss-20b",
+  apiKey: getConfig().GROQ_API_KEY,
 });
 
 const supervisorAgent = model.withStructuredOutput(routingSchema);
