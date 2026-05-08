@@ -1,6 +1,6 @@
 {
   "name": "researchify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Researchify - A CLI multi-agent research assistant built using LangChain and LangGraph",
   "main": "dist/index.js",
   "type": "module",

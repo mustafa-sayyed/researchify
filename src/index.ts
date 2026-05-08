@@ -5,78 +5,38 @@ dotenv.config({
 	path: "./.env",
 	quiet: true,
 });
-import figlet from "figlet";
-import chalk from "chalk";
-import { printLine } from "./utils/printLineSpace.js";
-import inquirer from "inquirer";
 import { loadCredentials } from "./utils/ensureCredentials.js";
 import { logError } from "./utils/logger.js";
+import { printResearchify } from "./utils/printRsearchify.js";
+import { program } from "commander";
+import { startRsearch } from "./researchWorkflow.js";
 
-async function startRsearch() {
-	const res = await inquirer
-		.prompt([
-			{
-				type: "input",
-				name: "reasearchTopic",
-				message: "Topic to Research:",
-			},
-		])
-		.catch((err) => {
-			logError("\nError taking user input", err);
-			logError("Exiting...");
-			process.exit(0);
-		});
-	printLine();
-	console.log(chalk.magentaBright(`You asked for: ${res.reasearchTopic}`));
-	printLine();
+program
+	.name("researchify")
+	.alias("rs")
+	.description(
+		"Your AI Research Assistant. Ask it to research any topic and get a comprehensive report with all the relevant information, links, and resources.",
+	)
+	.version("1.0.0")
+	.showHelpAfterError();
 
-	// Dynamic Import after taking all required inputs from user
-	const { buildGraph } = await import("./graph.js");
+program
+	.command("setup")
+	.description("Setup your credentials for Researchify")
+	.action(async () => {
+		printResearchify();
+		await loadCredentials();
+	});
 
-	const graph = buildGraph();
+program
+	.command("start")
+	.description("Start the research workflow")
+	.action(async () => {
+		printResearchify();
+		await startRsearch();
+	});
 
-	console.log("Starting research workflow...");
-	const result = await graph.invoke(
-		{
-			query: res.reasearchTopic,
-		},
-		{
-			configurable: {
-				thread_id: "1",
-			},
-		},
-	);
-
-	console.log(chalk.bold.blueBright("\n\n=== FINAL REPORT ===\n\n"));
-	console.log(result.finalReport);
-	console.log(chalk.green("\nResearch workflow complete."));
-}
-
-async function main() {
-	printLine(2);
-
-	console.log(
-		chalk.magenta(
-			figlet.textSync("Rsearchify", {
-				horizontalLayout: "default",
-				font: "Coder Mini",
-			}),
-		),
-	);
-	console.log(
-		chalk.magenta(
-			"Your AI Research Assistant. Ask it to research any topic and get a comprehensive report with all the relevant information, links, and resources.",
-		),
-	);
-
-	printLine(2);
-
-	await loadCredentials();
-
-	await startRsearch();
-}
-
-main().catch(console.error);
+program.parse();
 
 process.on("SIGINT", () => {
 	logError("\nProcess interrupted. Exiting...");
