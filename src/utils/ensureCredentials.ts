@@ -1,15 +1,15 @@
 import { set } from "zod";
 import { setConfig, validateCredentials } from "../config/index.js";
 import { loadCredentialsFromFile } from "./credentials.js";
-import { logSuccess } from "./logger.js";
+import { logError, logSuccess } from "./logger.js";
 import { takeUserInputForCredentials } from "./takeUserInputForCredential.js";
 import { printLine } from "./printLineSpace.js";
 
-export async function loadCredentials() {
+export async function loadCredentials(takeInput = true): Promise<void> {
 	// 1. If provided via env
 	const envCredentials = validateCredentials(process.env);
 	if (envCredentials) {
-        setConfig(envCredentials);
+		setConfig(envCredentials);
 		logSuccess("Using credentials found in environment variables.", true);
 		return;
 	}
@@ -23,5 +23,10 @@ export async function loadCredentials() {
 	}
 
 	// 3. Prompt user to enter credentials
-	await takeUserInputForCredentials();
+	if (takeInput) {
+		await takeUserInputForCredentials();
+	} else {
+		logError("No credentials found. Please run 'researchify setup' to enter your API keys.");
+		return process.exit(0);
+	}
 }

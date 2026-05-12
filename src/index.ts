@@ -13,7 +13,6 @@ import { startRsearch } from "./researchWorkflow.js";
 
 program
 	.name("researchify")
-	.alias("rs")
 	.description(
 		"Your AI Research Assistant. Ask it to research any topic and get a comprehensive report with all the relevant information, links, and resources.",
 	)
@@ -25,7 +24,7 @@ program
 	.description("Setup your credentials for Researchify")
 	.action(async () => {
 		printResearchify();
-		await loadCredentials();
+		await loadCredentials(true);
 	});
 
 program
@@ -33,8 +32,14 @@ program
 	.description("Start the research workflow")
 	.action(async () => {
 		printResearchify();
+		await loadCredentials(false);
 		await startRsearch();
 	});
+
+// Show help when no command is provided
+if (process.argv.length === 2) {
+	program.help();
+}
 
 program.parse();
 

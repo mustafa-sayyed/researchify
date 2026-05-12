@@ -41,7 +41,13 @@ The values are stored locally in:
 After installation, run:
 
 ```bash
-researchify
+researchify setup
+# Use this command to set up or update your API credentials at any time
+```
+
+```bash
+researchify start 
+# Use this command to start a new research session and generate a report on a topic of your choice
 ```
 
 The CLI will prompt you for a research topic, then generate a research report.
